@@ -1,14 +1,12 @@
 # command to build onefile executable
-# pyinstaller --onefile Copy_This_File_To_Client_Code_To_Create_Client_Code.py
+# pyinstaller --onefile create_client_code.py
 
 import sys
 import os
 import shutil
-import glob
 
 if len(sys.argv) == 1:
     from PySide6.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPushButton
-    from PySide6 import QtCore, QtGui
     from PySide6.QtGui import *
     from PySide6.QtCore import *
 
