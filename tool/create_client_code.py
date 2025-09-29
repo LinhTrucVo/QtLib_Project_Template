@@ -25,6 +25,22 @@ def createTaskCode(src_task_name, dst_task_name):
             pycache_path = os.path.join(root, '__pycache__')
             shutil.rmtree(pycache_path)
 
+    # First, collect all directories that need to be renamed
+    dirs_to_rename = []
+    for root, dirs, files in os.walk(dst_folder):
+        for dirname in dirs:
+            if src_task_name in dirname:
+                full_dir_path = os.path.join(root, dirname)
+                dirs_to_rename.append(full_dir_path)
+    
+    # Rename directories (deepest first to avoid path conflicts)
+    dirs_to_rename.sort(key=len, reverse=True)
+    for dir_path in dirs_to_rename:
+        if os.path.exists(dir_path):  # Check if directory still exists (might have been renamed as part of parent)
+            new_dir_path = dir_path.replace(src_task_name, dst_task_name)
+            print(f"Renaming directory: {dir_path} -> {new_dir_path}")
+            os.rename(dir_path, new_dir_path)
+
     # Process files recursively in all subdirectories
     for root, dirs, files in os.walk(dst_folder):
         # Skip __pycache__ directories
