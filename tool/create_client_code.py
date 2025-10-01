@@ -27,6 +27,25 @@ def createTaskCode(src_task_name, dst_task_name):
             pycache_path = os.path.join(root, '__pycache__')
             shutil.rmtree(pycache_path)
 
+    # First, rename directories from bottom to top
+    dirs_to_rename = []
+    for root, dirs, files in os.walk(dst_folder):
+        for dirname in dirs:
+            if src_task_name in dirname:
+                old_dir_path = os.path.join(root, dirname)
+                new_dir_name = dirname.replace(src_task_name, dst_task_name)
+                new_dir_path = os.path.join(root, new_dir_name)
+                dirs_to_rename.append((old_dir_path, new_dir_path))
+    
+    # Sort by depth (deepest first) to avoid conflicts
+    dirs_to_rename.sort(key=lambda x: x[0].count(os.sep), reverse=True)
+    
+    # Rename directories
+    for old_path, new_path in dirs_to_rename:
+        if os.path.exists(old_path):
+            print(f"Renaming directory: {old_path} -> {new_path}")
+            os.rename(old_path, new_path)
+
     # Process files recursively in all subdirectories
     for root, dirs, files in os.walk(dst_folder):
         # Skip __pycache__ directories
@@ -35,18 +54,22 @@ def createTaskCode(src_task_name, dst_task_name):
             if filename != os.path.basename(__file__):
                 full_file_name = os.path.join(root, filename)
                 if os.path.isfile(full_file_name):
-                    file = open(full_file_name)
-                    file_content = file.read()
+                    # Update file content
+                    with open(full_file_name, 'r', encoding='utf-8', errors='ignore') as file:
+                        file_content = file.read()
+                    
                     new_file_content = file_content.replace(src_task_name, dst_task_name)
                     new_file_content = new_file_content.replace(src_task_name.upper(), dst_task_name.upper())
-                    file.close()
+                    
+                    with open(full_file_name, 'w', encoding='utf-8') as file:
+                        file.write(new_file_content)
 
-                    file = open(full_file_name, "w+")
-                    file.write(new_file_content)
-                    file.close()
-
-                    temp_str = full_file_name.replace(src_task_name, dst_task_name)
-                    os.rename(full_file_name, temp_str)
+                    # Rename file if filename contains src_task_name
+                    if src_task_name in filename:
+                        new_filename = filename.replace(src_task_name, dst_task_name)
+                        new_full_path = os.path.join(root, new_filename)
+                        print(f"Renaming file: {full_file_name} -> {new_full_path}")
+                        os.rename(full_file_name, new_full_path)
 
     if len(sys.argv) == 1:
         QApplication.instance().quit()
