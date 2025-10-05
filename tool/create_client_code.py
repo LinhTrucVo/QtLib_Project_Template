@@ -14,12 +14,30 @@ if len(sys.argv) == 1:
 
 # Function to rename multiple files
 def createTaskCode(src_task_name, dst_task_name):
-    if os.path.exists(dst_task_name):
-        shutil.rmtree(os.getcwd() + "/" + dst_task_name)
+    # Check if we're running from within the source task directory
+    current_dir_name = os.path.basename(os.getcwd())
+    if current_dir_name == src_task_name:
+        # We're inside the source directory, go up one level to find the parent
+        parent_dir = os.path.dirname(os.getcwd())
+        src_folder = os.path.join(parent_dir, src_task_name)
+        dst_folder = os.path.join(parent_dir, dst_task_name)
+    else:
+        # We're in the parent directory containing the source folder
+        src_folder = os.path.join(os.getcwd(), src_task_name)
+        dst_folder = os.path.join(os.getcwd(), dst_task_name)
 
-    src_folder = os.getcwd() + "/" + src_task_name
-    dst_folder = os.getcwd() + "/" + dst_task_name
+    # Check if source folder exists
+    if not os.path.exists(src_folder):
+        print(f"Error: Source folder '{src_folder}' does not exist!")
+        return
 
+    # Remove destination folder if it exists
+    if os.path.exists(dst_folder):
+        shutil.rmtree(dst_folder)
+
+    print(f"Copying from: {src_folder}")
+    print(f"Copying to: {dst_folder}")
+    
     shutil.copytree(src_folder, dst_folder)
     # Remove __pycache__ directories from destination folder
     for root, dirs, files in os.walk(dst_folder):
@@ -103,7 +121,11 @@ def main():
         sys.exit(app.exec())
 
     else:
-        createTaskCode(sys.argv[1])
+        if len(sys.argv) >= 3:
+            createTaskCode(sys.argv[1], sys.argv[2])
+        else:
+            print("Usage: python create_client_code.py <source_task_name> <destination_task_name>")
+            print("Example: python create_client_code.py Task_1 Task_2")
 
 # Driver Code
 if __name__ == '__main__':
