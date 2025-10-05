@@ -102,14 +102,14 @@ def main():
         label_1 = QLabel("Name", win)
         label_1.setGeometry(5, 5, 100, 15)
 
-        line_edit = QLineEdit("Task_2", win)
+        line_edit = QLineEdit("Task2", win)
         line_edit.setGeometry(label_1.x(), label_1.y() + 20, 200, 30)
         line_edit.setCursorPosition(0)
 
         label_2 = QLabel("Copy from", win)
         label_2.setGeometry(label_1.x(), label_1.y() + 70, 300, 15)
 
-        line_edit_1 = QLineEdit("Task_1", win)
+        line_edit_1 = QLineEdit("Task1", win)
         line_edit_1.setGeometry(label_1.x(), label_2.y() + 20, 200, 30)
         line_edit_1.setCursorPosition(0)
 
